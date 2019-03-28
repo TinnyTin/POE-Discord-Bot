@@ -1,0 +1,6 @@
+DISCORD BOT GOALS
+- stream announcement
+- trade channel chat scanner alerts
+
+side: 
+twitch channel 'users in chat' scanner
