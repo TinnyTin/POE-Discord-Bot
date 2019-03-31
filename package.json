@@ -1,12 +1,11 @@
 {
-  "name": "greeter-bot",
+  "name": "kaitoh-bot",
   "version": "1.0.0",
   "description": "idk what i'm doing",
   "main": "bot.js",
   "author": "judy",
   "dependencies": {
-    "discord.io": "https://github.com/woor/discord.io/tarball/gateway_v6",
     "discord.js": "^11.4.2",
-    "winston": "^3.2.1"
+    "poe-ninja-api-manager": "^0.7.0"
   }
 }

@@ -1,5 +1,11 @@
 const Discord = require('discord.js')
 const client = new Discord.Client()
+var NinjaAPI = require("poe-ninja-api-manager");
+
+var ninjaAPI = new NinjaAPI({
+  league: "Synthesis"
+});
+
 
 client.on('ready', () => {
     console.log("Connected as " + client.user.tag)
@@ -48,5 +54,12 @@ client.on('guildMemberAdd', member => {
     }
     else if (message.content.trim() == "!maplayouts") {
       message.channel.send("https://docs.google.com/document/d/1sExA-AnTbroJ-HN2neZiij5G4X9u2ENlC7m_zf1tqP8/edit");
+    }
+    else if (message.content.trim() == "!ninja") {
+      ninjaAPI.update()
+        .then((result) => {
+          console.log("Updated data, here are the results of the requests:", result);
+          return ninjaAPI.save();
+        })
     }
        });
