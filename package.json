@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "idk what i'm doing",
   "main": "bot.js",
-  "author": "judy",
+  "author": "judy and martin",
   "dependencies": {
     "discord.js": "^11.4.2",
     "poe-ninja-api-manager": "^0.7.0"

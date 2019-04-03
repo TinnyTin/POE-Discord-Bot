@@ -1,17 +1,61 @@
-const Discord = require('discord.js')
-const client = new Discord.Client()
+const Discord = require('discord.js');
+const client = new Discord.Client();
 var NinjaAPI = require("poe-ninja-api-manager");
+
 
 var ninjaAPI = new NinjaAPI({
   league: "Synthesis"
 });
 
+class CurrencyRow {
+  constructor(name,buyvalue,sellvalue) {
+    this.name = name;
+    this.buyvalue = buyvalue;
+    this.sellvalue = sellvalue;
+  }
+  //Returns name of the Currency
+  name() {
+    return this.name;
+  }
+  //Returns sell value of the Currency
+  sell() {
+    return this.sellvalue;
+  }
+  //Returns buy value of the Currency
+  buy() {
+    return this.buyvalue;
+  }
+}
+
+// Contain all currency data
+let currencyData = [];
+
+// Dictionary with currency name to custom emoji id. CurrencyName:Emoji
+var currDict = {
+  "Mirror Of Kalandra": "<:mirror:562221382394445845>",
+  "Exalted Orb": "<:exa:562076209991647233>",
+  "Orb of Annulment": "<:annul:562075957289287681>",
+  "Divine Orb": "<:divine:562076191490703380>",
+  "Harbinger's Orb": "<:harbinger:562626908047540225>",
+  "Master Cartographer's Sextant": "<:redsextant:562076565773615116>",
+  "Journeyman Cartographer's Sextant": "<:yellowsextant:562076541836722206>",
+  "Splinter of Chayula": "<:splinter:562627892090109962>",
+  "Apprentice Cartographer's Sextant": "<:whitesextant:562075981830160385>",
+  "Vaal Orb": "<:vaal:562076451260858368>",
+  "Regal Orb": "<:regal:562076374949691402>",
+  "Gemcutter's Prism": "<:gcp:562076303658975242>",
+  "Orb of Regret": "<:regret:562076401524801557>",
+  "Cartographer's Chisel": "<:chisel:562076133391204361>",
+  "Orb of Fusing": "<:fusing:562076245660008459>",
+  "Orb of Alchemy": "<:alch:562075893900509195>",
+  "Orb of Scouring": "<:scour:562076420134797326>",
+  "Blessed Orb": "<:blessed:562076035253010442>",
+  "Chaos Orb": "<:chaos:562076109865484289>"
+};
 
 client.on('ready', () => {
     console.log("Connected as " + client.user.tag)
 })
-//\n \ Alpline Hideout : Summit Map [T13] : Very Rare \n \ Divided Hideout : The Twilight Temple : Rare \n \ ```"
-
 
 // Get your bot's secret token from:
 // https://discordapp.com/developers/applications/
@@ -55,47 +99,75 @@ client.on('guildMemberAdd', member => {
       ninjaAPI.update()
         .then((result) => {
           console.log("Updated data, here are the results of the requests:", result[0].data.lines)
-          var i;
-          for (i = 0; i < result[0].data.lines.length; i++) {
-            if (result[0].data.lines[i].pay && result[0].data.lines[i].receive) {
-            var payvalue = calcRatio(result[0].data.lines[i].pay.value);
-            name = result[0].data.lines[i].currencyTypeName
-            receivevalue = result[0].data.lines[i].receive.value;
-            console.log('Sell: ' + name + " : " + payvalue);
-            console.log('Buy: ' + name + " : " + receivevalue);
-
-            }
-          }
+          populateCurrency(result);
+          sortCurrency();
           message.channel.send({embed});
-          // console.log(ninjaAPI.getCurrencyDetails("Mirror of Kalandra"));
-          // console.log(ninjaAPI.getCurrencyDetails("blessing-of-chayula"));
-          // console.log(ninjaAPI.getCurrencyDetails("Orb of Alchemy"));
           return ninjaAPI.save();
         })
     }
        });
 
-function calcRatio(value) {
-  return (1 / parseFloat(value)).toFixed(1);
+function sortCurrency(){
+
 }
 
+function populateCurrency(result){
+  var i;
+  for (i = 0; i < result[0].data.lines.length; i++) {
+    if (result[0].data.lines[i].pay && result[0].data.lines[i].receive) {
+    var sellvalue = calcValue(result[0].data.lines[i].pay.value);
+    var buyvalue = result[0].data.lines[i].receive.value;
+    var name = result[0].data.lines[i].currencyTypeName;
+    currencyData.push(new CurrencyRow(name,buyvalue,sellvalue));
+    }
+  }
+}
+
+function calcValue(value) {
+  result = (1 / parseFloat(value)).toFixed(1);
+  return result;
+}
+
+
+function getDate(){
+  var d = new Date,
+      dformat = [d.getMonth()+1,
+                 d.getDate(),
+                 d.getFullYear()].join('/')+' '+
+                [d.getHours(),
+                 d.getMinutes(),
+                 d.getSeconds()].join(':');
+  return d;
+}
+
+// This is a standin
+const buytable = "? x <:chaos:562076109865484289>   => 1.0 x <:mirror:562221382394445845>  \n" +
+                "? x <:chaos:562076109865484289>   => 1.0 x <:exa:562076209991647233> \n" +
+                "? x <:chaos:562076109865484289>   => 1.0 x <:annul:562075957289287681> \n" +
+                "? x <:chaos:562076109865484289>   => 1.0 x <:ancient:562627051065049107> \n" +
+                "? x <:chaos:562076109865484289>   => 1.0 x <:divine:562076191490703380> \n" +
+                "? x <:chaos:562076109865484289>   => 1.0 x <:harbinger:562626908047540225>  \n" +
+                "? x <:chaos:562076109865484289>   => 1.0 x <:redsextant:562076565773615116>  \n" +
+                "? x <:chaos:562076109865484289>   => 1.0 x <:yellowsextant:562076541836722206>   \n" +
+                "? x <:chaos:562076109865484289>   => 1.0 x <:splinter:562627892090109962> \n" +
+                "? x <:chaos:562076109865484289>   => 1.0 x <:whitesextant:562075981830160385> \n" +
+                "? x <:chaos:562076109865484289>   => 1.0 x <:vaal:562076451260858368> \n" +
+                "? x <:chaos:562076109865484289>   => 1.0 x <:regal:562076374949691402>  \n" +
+                "? x <:chaos:562076109865484289>   => 1.0 x <:gcp:562076303658975242> \n" +
+                "? x <:chaos:562076109865484289>   => 1.0 x <:regret:562076401524801557> \n" +
+                "? x <:chaos:562076109865484289>   => 1.0 x <:chisel:562076133391204361>  \n" +
+                "? x <:chaos:562076109865484289>   => 1.0 x <:fusing:562076245660008459>  \n" +
+                "? x <:chaos:562076109865484289>   => 1.0 x <:alch:562075893900509195>  \n" +
+                "? x <:chaos:562076109865484289>   => 1.0 x <:scour:562076420134797326> \n"  +
+                "? x <:chaos:562076109865484289>   => 1.0 x <:blessed:562076035253010442>" ;
+
+
 const embed = new Discord.RichEmbed()
-  .setDescription("? x <:chaos:562076109865484289>   => 1.0 x <:mirror:562221382394445845>  \n" +
-                  "? x <:chaos:562076109865484289>   => 1.0 x <:exa:562076209991647233> \n" +
-                  "? x <:chaos:562076109865484289>   => 1.0 x <:annul:562075957289287681> \n" +
-                  "? x <:chaos:562076109865484289>   => 1.0 x <:ancient:562627051065049107> \n" +
-                  "? x <:chaos:562076109865484289>   => 1.0 x <:divine:562076191490703380> \n" +
-                  "? x <:chaos:562076109865484289>   => 1.0 x <:harbinger:562626908047540225>  \n" +
-                  "? x <:chaos:562076109865484289>   => 1.0 x <:redsextant:562076565773615116>  \n" +
-                  "? x <:chaos:562076109865484289>   => 1.0 x <:yellowsextant:562076541836722206>   \n" +
-                  "? x <:chaos:562076109865484289>   => 1.0 x <:splinter:562627892090109962> \n" +
-                  "? x <:chaos:562076109865484289>   => 1.0 x <:vaal:562076451260858368> \n" +
-                  "? x <:chaos:562076109865484289>   => 1.0 x <:whitesextant:562075981830160385>  \n" +
-                  "? x <:chaos:562076109865484289>   => 1.0 x <:regal:562076374949691402>  \n" +
-                  "? x <:chaos:562076109865484289>   => 1.0 x <:gcp:562076303658975242> \n" +
-                  "? x <:chaos:562076109865484289>   => 1.0 x <:regret:562076401524801557> \n" +
-                  "? x <:chaos:562076109865484289>   => 1.0 x <:chisel:562076133391204361>  \n" +
-                  "? x <:chaos:562076109865484289>   => 1.0 x <:fusing:562076245660008459>  \n" +
-                  "? x <:chaos:562076109865484289>   => 1.0 x <:alch:562075893900509195>  \n" +
-                  "? x <:chaos:562076109865484289>   => 1.0 x :<:scour:562076420134797326> \n"  +
-                  "? x <:chaos:562076109865484289>   => 1.0 x <:blessed:562076035253010442>");
+  .setColor('AQUA')
+  .setAuthor("Currency Table")
+  .setTitle("**poe.ninja's Buy column**")
+  .setURL("https://poe.ninja/challenge/currency")
+  .setFooter("Sourced from poe.ninja","https://poe.ninja/images/ninja-logo.png")
+  .setThumbnail("https://gamepedia.cursecdn.com/pathofexile_gamepedia/9/9c/Chaos_Orb_inventory_icon.png")
+  .setTimestamp(getDate())
+  .setDescription(buytable);
