@@ -32,7 +32,7 @@ let currencyData = [];
 
 // Dictionary with currency name to custom emoji id. CurrencyName:Emoji
 var currDict = {
-  "Mirror Of Kalandra": "<:mirror:562221382394445845>",
+  "Mirror of Kalandra": "<:mirror:562221382394445845>",
   "Exalted Orb": "<:exa:562076209991647233>",
   "Orb of Annulment": "<:annul:562075957289287681>",
   "Divine Orb": "<:divine:562076191490703380>",
@@ -98,18 +98,21 @@ client.on('guildMemberAdd', member => {
     else if (message.content.trim() == "!ninja") {
       ninjaAPI.update()
         .then((result) => {
-          console.log("Updated data, here are the results of the requests:", result[0].data.lines)
+          //console.log("Updated data, here are the results of the requests:", result[0].data.lines)
           populateCurrency(result);
-          sortCurrency();
+          //sortCurrency();
+          console.log(getTable());
+          for (i=0; i<currencyData.length; i++) {
+            console.log(currencyData[i]);
+          }
           message.channel.send({embed});
           return ninjaAPI.save();
+
+        
         })
     }
        });
 
-function sortCurrency(){
-
-}
 
 function populateCurrency(result){
   var i;
@@ -141,26 +144,23 @@ function getDate(){
 }
 
 // This is a standin
-const buytable = "? x <:chaos:562076109865484289>   => 1.0 x <:mirror:562221382394445845>  \n" +
-                "? x <:chaos:562076109865484289>   => 1.0 x <:exa:562076209991647233> \n" +
-                "? x <:chaos:562076109865484289>   => 1.0 x <:annul:562075957289287681> \n" +
-                "? x <:chaos:562076109865484289>   => 1.0 x <:ancient:562627051065049107> \n" +
-                "? x <:chaos:562076109865484289>   => 1.0 x <:divine:562076191490703380> \n" +
-                "? x <:chaos:562076109865484289>   => 1.0 x <:harbinger:562626908047540225>  \n" +
-                "? x <:chaos:562076109865484289>   => 1.0 x <:redsextant:562076565773615116>  \n" +
-                "? x <:chaos:562076109865484289>   => 1.0 x <:yellowsextant:562076541836722206>   \n" +
-                "? x <:chaos:562076109865484289>   => 1.0 x <:splinter:562627892090109962> \n" +
-                "? x <:chaos:562076109865484289>   => 1.0 x <:whitesextant:562075981830160385> \n" +
-                "? x <:chaos:562076109865484289>   => 1.0 x <:vaal:562076451260858368> \n" +
-                "? x <:chaos:562076109865484289>   => 1.0 x <:regal:562076374949691402>  \n" +
-                "? x <:chaos:562076109865484289>   => 1.0 x <:gcp:562076303658975242> \n" +
-                "? x <:chaos:562076109865484289>   => 1.0 x <:regret:562076401524801557> \n" +
-                "? x <:chaos:562076109865484289>   => 1.0 x <:chisel:562076133391204361>  \n" +
-                "? x <:chaos:562076109865484289>   => 1.0 x <:fusing:562076245660008459>  \n" +
-                "? x <:chaos:562076109865484289>   => 1.0 x <:alch:562075893900509195>  \n" +
-                "? x <:chaos:562076109865484289>   => 1.0 x <:scour:562076420134797326> \n"  +
-                "? x <:chaos:562076109865484289>   => 1.0 x <:blessed:562076035253010442>" ;
 
+
+function getTable(){
+  var i;
+  var result = "";
+  for (i=0; i<currencyData.length; i++) {
+    //result += currencyData[i].name + " : " + currencyData[i].buyvalue + "\n";
+    var name = currencyData[i].name;
+    if (currDict[name] != undefined) {
+      var row = currencyData[i].buyvalue.toFixed(1) + " x <:chaos:562076109865484289>   => 1.0 x " + currDict[name] + "\n";
+      //console.log(row);
+      result += row;
+    }
+    i++;
+  }
+  return result;
+}
 
 const embed = new Discord.RichEmbed()
   .setColor('AQUA')
@@ -170,4 +170,4 @@ const embed = new Discord.RichEmbed()
   .setFooter("Sourced from poe.ninja","https://poe.ninja/images/ninja-logo.png")
   .setThumbnail("https://gamepedia.cursecdn.com/pathofexile_gamepedia/9/9c/Chaos_Orb_inventory_icon.png")
   .setTimestamp(getDate())
-  .setDescription(buytable);
+  .setDescription(getTable());
