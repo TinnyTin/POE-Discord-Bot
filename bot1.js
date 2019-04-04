@@ -29,7 +29,7 @@ class CurrencyRow {
 
 // Contain all currency data
 let currencyData = [];
-
+let dataReady = false;
 // Dictionary with currency name to custom emoji id. CurrencyName:Emoji
 var currDict = {
   "Mirror of Kalandra": "<:mirror:562221382394445845>",
@@ -100,27 +100,38 @@ client.on('guildMemberAdd', member => {
         .then((result) => {
           //console.log("Updated data, here are the results of the requests:", result[0].data.lines)
           populateCurrency(result);
-          //sortCurrency();
-          //console.log(getTable());
-          getTable();
-          message.channel.send({embed});
+          message.channel.send(updateEmbed());
           return ninjaAPI.save();
         })
     }
        });
 
 
-function populateCurrency(result){
+function updateEmbed(){
+      embed = new Discord.RichEmbed()
+      .setColor('AQUA')
+      .setAuthor("Currency Table")
+      .setTitle("**poe.ninja's Buy column**")
+      .setURL("https://poe.ninja/challenge/currency")
+      .setFooter("Sourced from poe.ninja","https://poe.ninja/images/ninja-logo.png")
+      .setThumbnail("https://gamepedia.cursecdn.com/pathofexile_gamepedia/9/9c/Chaos_Orb_inventory_icon.png")
+      .setTimestamp(getDate())
+      .setDescription(getTable());
+      return embed;
+}
+
+function populateCurrency(result) {
   var i;
   for (i = 0; i < result[0].data.lines.length; i++) {
     if (result[0].data.lines[i].pay && result[0].data.lines[i].receive) {
-    var sellvalue = calcValue(result[0].data.lines[i].pay.value);
-    var buyvalue = result[0].data.lines[i].receive.value;
-    var name = result[0].data.lines[i].currencyTypeName;
-    currencyData.push(new CurrencyRow(name,buyvalue,sellvalue));
+      var sellvalue = calcValue(result[0].data.lines[i].pay.value);
+      var buyvalue = result[0].data.lines[i].receive.value;
+      var name = result[0].data.lines[i].currencyTypeName;
+      currencyData.push(new CurrencyRow(name,buyvalue,sellvalue));
     }
   }
 }
+
 
 function calcValue(value) {
   result = (1 / parseFloat(value)).toFixed(1);
@@ -140,25 +151,13 @@ function getDate(){
 }
 
 function getTable(){
-  var i;
-  var result = "";
-  for (i=0; i<currencyData.length; i++) {
-    //result += currencyData[i].name + " : " + currencyData[i].buyvalue + "\n";
-    var name = currencyData[i].name;
+  result = "";
+  for (row of currencyData) {
+    var name = row.name;
     if (currDict[name] != undefined) {
-      var row = currencyData[i].buyvalue.toFixed(1) + " x <:chaos:562076109865484289>   => 1.0 x " + currDict[name] + "\n";
-      result += row;
+      var line = row.buyvalue.toFixed(1) + " x <:chaos:562076109865484289>   => 1.0 x " + currDict[name] + "\n";
+      result += line;
     }
   }
-  return result.toString();
+  return result;
 }
-
-const embed = new Discord.RichEmbed()
-  .setColor('AQUA')
-  .setAuthor("Currency Table")
-  .setTitle("**poe.ninja's Buy column**")
-  .setURL("https://poe.ninja/challenge/currency")
-  .setFooter("Sourced from poe.ninja","https://poe.ninja/images/ninja-logo.png")
-  .setThumbnail("https://gamepedia.cursecdn.com/pathofexile_gamepedia/9/9c/Chaos_Orb_inventory_icon.png")
-  .setTimestamp(getDate())
-  .setDescription(getTable().toString());
