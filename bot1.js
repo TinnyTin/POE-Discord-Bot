@@ -101,14 +101,10 @@ client.on('guildMemberAdd', member => {
           //console.log("Updated data, here are the results of the requests:", result[0].data.lines)
           populateCurrency(result);
           //sortCurrency();
-          console.log(getTable());
-          for (i=0; i<currencyData.length; i++) {
-            console.log(currencyData[i]);
-          }
+          //console.log(getTable());
+          getTable();
           message.channel.send({embed});
           return ninjaAPI.save();
-
-        
         })
     }
        });
@@ -143,9 +139,6 @@ function getDate(){
   return d;
 }
 
-// This is a standin
-
-
 function getTable(){
   var i;
   var result = "";
@@ -154,12 +147,10 @@ function getTable(){
     var name = currencyData[i].name;
     if (currDict[name] != undefined) {
       var row = currencyData[i].buyvalue.toFixed(1) + " x <:chaos:562076109865484289>   => 1.0 x " + currDict[name] + "\n";
-      //console.log(row);
       result += row;
     }
-    i++;
   }
-  return result;
+  return result.toString();
 }
 
 const embed = new Discord.RichEmbed()
@@ -170,4 +161,4 @@ const embed = new Discord.RichEmbed()
   .setFooter("Sourced from poe.ninja","https://poe.ninja/images/ninja-logo.png")
   .setThumbnail("https://gamepedia.cursecdn.com/pathofexile_gamepedia/9/9c/Chaos_Orb_inventory_icon.png")
   .setTimestamp(getDate())
-  .setDescription(getTable());
+  .setDescription(getTable().toString());
