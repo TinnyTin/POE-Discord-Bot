@@ -125,7 +125,16 @@ function populateCurrency(result) {
   for (i = 0; i < result[0].data.lines.length; i++) {
     if (result[0].data.lines[i].pay && result[0].data.lines[i].receive) {
       var sellvalue = calcValue(result[0].data.lines[i].pay.value);
+      if (i == 0) {
+        var receive = parseFloat(result[0].data.lines[i].receive.value);
+        console.log(receive);
+        console.log(typeof receive);
+        var buyvalue = Math.Round(receive/100)*100 / 1.0e+3;
+        buyvalue = buyvalue + "k"
+      }
+      else {
       var buyvalue = result[0].data.lines[i].receive.value;
+      }
       var name = result[0].data.lines[i].currencyTypeName;
       currencyData.push(new CurrencyRow(name,buyvalue,sellvalue));
     }
