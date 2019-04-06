@@ -126,14 +126,11 @@ function populateCurrency(result) {
     if (result[0].data.lines[i].pay && result[0].data.lines[i].receive) {
       var sellvalue = calcValue(result[0].data.lines[i].pay.value);
       if (i == 0) {
-        var receive = parseFloat(result[0].data.lines[i].receive.value);
-        console.log(receive);
-        console.log(typeof receive);
-        var buyvalue = Math.Round(receive/100)*100 / 1.0e+3;
-        buyvalue = buyvalue + "k"
+        var receive = (parseFloat(result[0].data.lines[i].receive.value)/100)*100/ 1.0e+3;
+        var buyvalue = receive.toFixed(1) + "k";
       }
       else {
-      var buyvalue = result[0].data.lines[i].receive.value;
+      var buyvalue = result[0].data.lines[i].receive.value.toFixed(1);
       }
       var name = result[0].data.lines[i].currencyTypeName;
       currencyData.push(new CurrencyRow(name,buyvalue,sellvalue));
@@ -159,14 +156,39 @@ function getDate(){
   return d;
 }
 
+
+
 function getTable(){
   result = "";
   for (row of currencyData) {
     var name = row.name;
     if (currDict[name] != undefined) {
-      var line = row.buyvalue.toFixed(1) + " x <:chaos:562076109865484289>   => 1.0 x " + currDict[name] + "\n";
-      result += line;
+      var line = row.buyvalue + " × <:chaos:562076109865484289>   →     1.0 × " + currDict[name] + "\n";
+      paddedline = row.buyvalue + padString(line) + " × <:chaos:562076109865484289>   →     1.0 × " + currDict[name] + "\n"
+      result += paddedline;
     }
   }
   return result;
+}
+
+function padString(str){
+
+  count = countDigits(str);
+  //console.log(count);
+  var numWhitespace = 8-count;
+  console.log(numWhitespace);
+  //console.log(numWhitespace);
+  var result = " ".repeat(parseFloat(numWhitespace));
+  console.log(result);
+  return result;
+}
+
+function countDigits(str){
+  var count = 0;
+  for (i = 0; i < 6; i++) {
+    if (!isNaN(parseFloat(str.charAt(i)))){
+      count++;
+    }
+  }
+  return count;
 }
