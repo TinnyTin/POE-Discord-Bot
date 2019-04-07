@@ -179,10 +179,11 @@ function padString(str){
 
   var numOnes = countOnes(str);
   var numLarge = countLWidth(str);
+
   var numWhitespace = 7-count-numLarge;
   // Pad according to number of digits, zeros and ones. All 3 have differing widths to pad.
   var result = "\u2000".repeat(parseFloat(numWhitespace));
-  result += "\u2009\u200a".repeat(parseFloat(numOnes));
+  result += "\u200a\u200a".repeat(parseFloat(numOnes));
   result += "\u200a".repeat(parseFloat(numLarge)*6);
   return result;
 }
@@ -193,17 +194,19 @@ function countLWidth(str){
     if (!isNaN(parseFloat(str.charAt(i))) &&
     (str.charAt(i) == '0'
     || str.charAt(i) == '4'
-    || str.charAt(i) == '9')){
+    || str.charAt(i) == '9'
+    || str.charAt(i) == '8' || str.charAt(i) == '6'
+    || str.charAt(i) == '2' || str.charAt(i) == '3')){
         count++;
     }
   }
   return count;
 }
 
-function countOnes(str){
+ function countOnes(str){
   var count = 0;
   for (i = 0; i < 6; i++) {
-    if (!isNaN(parseFloat(str.charAt(i))) && str.charAt(i) == '1'){
+    if (!isNaN(parseFloat(str.charAt(i))) && (str.charAt(i) == '1')){
         count++;
     }
   }
@@ -214,7 +217,6 @@ function countDigits(str){
   var count = 0;
   for (i = 0; i < 6; i++) {
     if (!isNaN(parseFloat(str.charAt(i))) || str.charAt(i) == 'k'){
-
         count++;
     }
   }
