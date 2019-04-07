@@ -163,31 +163,59 @@ function getTable(){
   for (row of currencyData) {
     var name = row.name;
     if (currDict[name] != undefined) {
-      var line = row.buyvalue + " × <:chaos:562076109865484289>   →     1.0 × " + currDict[name] + "\n";
-      paddedline = row.buyvalue + padString(line) + " × <:chaos:562076109865484289>   →     1.0 × " + currDict[name] + "\n"
+      var paddedline = row.buyvalue + padString(row.buyvalue) + "× <:chaos:562076109865484289>   →     1.0 × " + currDict[name] + "\n"
+
       result += paddedline;
     }
   }
+  console.log(result);
   return result;
 }
 
 function padString(str){
 
+  // Count digits, zeros and ones.
   count = countDigits(str);
-  //console.log(count);
-  var numWhitespace = 8-count;
-  console.log(numWhitespace);
-  //console.log(numWhitespace);
-  var result = " ".repeat(parseFloat(numWhitespace));
-  console.log(result);
+
+  var numOnes = countOnes(str);
+  var numLarge = countLWidth(str);
+  var numWhitespace = 7-count-numLarge;
+  // Pad according to number of digits, zeros and ones. All 3 have differing widths to pad.
+  var result = "\u2000".repeat(parseFloat(numWhitespace));
+  result += "\u2009\u200a".repeat(parseFloat(numOnes));
+  result += "\u200a".repeat(parseFloat(numLarge)*6);
   return result;
+}
+
+function countLWidth(str){
+  var count = 0;
+  for (i = 0; i < 6; i++) {
+    if (!isNaN(parseFloat(str.charAt(i))) &&
+    (str.charAt(i) == '0'
+    || str.charAt(i) == '4'
+    || str.charAt(i) == '9')){
+        count++;
+    }
+  }
+  return count;
+}
+
+function countOnes(str){
+  var count = 0;
+  for (i = 0; i < 6; i++) {
+    if (!isNaN(parseFloat(str.charAt(i))) && str.charAt(i) == '1'){
+        count++;
+    }
+  }
+  return count;
 }
 
 function countDigits(str){
   var count = 0;
   for (i = 0; i < 6; i++) {
-    if (!isNaN(parseFloat(str.charAt(i)))){
-      count++;
+    if (!isNaN(parseFloat(str.charAt(i))) || str.charAt(i) == 'k'){
+
+        count++;
     }
   }
   return count;
