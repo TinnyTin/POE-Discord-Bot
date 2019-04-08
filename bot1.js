@@ -30,6 +30,8 @@ class CurrencyRow {
 // Contain all currency data
 let currencyData = [];
 let dataReady = false;
+
+var minTimer = 1000 * 60 * 15; //15 min
 // Dictionary with currency name to custom emoji id. CurrencyName:Emoji
 var currDict = {
   "Mirror of Kalandra": "<:mirror:562221382394445845>",
@@ -49,12 +51,13 @@ var currDict = {
   "Orb of Fusing": "<:fusing:562076245660008459>",
   "Orb of Alchemy": "<:alch:562075893900509195>",
   "Orb of Scouring": "<:scour:562076420134797326>",
-  "Blessed Orb": "<:blessed:562076035253010442>",
+  "Blessed Orb": "<:blescmdsed:562076035253010442>",
   "Chaos Orb": "<:chaos:562076109865484289>"
 };
 
 client.on('ready', () => {
     console.log("Connected as " + client.user.tag)
+
 })
 
 // Get your bot's secret token from:
@@ -100,7 +103,11 @@ client.on('guildMemberAdd', member => {
         .then((result) => {
           //console.log("Updated data, here are the results of the requests:", result[0].data.lines)
           populateCurrency(result);
-          message.channel.send(updateEmbed());
+          message.channel.send(updateEmbed()).then((msg)=>{
+          setInterval(function(){
+            msg.edit(updateEmbed());
+          }, minTimer);
+        })
           return ninjaAPI.save();
         })
     }
@@ -176,7 +183,7 @@ function padString(str){
 
   // Count digits, zeros and ones.
   count = countDigits(str);
-
+  var numK = checkK(str);
   var numOnes = countOnes(str);
   var numLarge = countLWidth(str);
 
@@ -185,6 +192,7 @@ function padString(str){
   var result = "\u2000".repeat(parseFloat(numWhitespace));
   result += "\u200a\u200a".repeat(parseFloat(numOnes));
   result += "\u200a".repeat(parseFloat(numLarge)*6);
+  result += "\u200a".repeat(parseFloat(numK));
   return result;
 }
 
@@ -199,6 +207,14 @@ function countLWidth(str){
     || str.charAt(i) == '2' || str.charAt(i) == '3')){
         count++;
     }
+  }
+  return count;
+}
+
+function checkK(str){
+  var count = 0;
+  if (str.indexOf('k')) {
+    count = 1;
   }
   return count;
 }
