@@ -29,6 +29,8 @@ class CurrencyRow {
 
 // Contain all currency data
 let currencyData = [];
+let sextants = [];
+let splinters = [];
 let dataReady = false;
 
 var minTimer = 1000 * 60 * 15; //15 min
@@ -41,8 +43,12 @@ var currDict = {
   "Harbinger's Orb": "<:harbinger:562626908047540225>",
   "Master Cartographer's Sextant": "<:redsextant:562076565773615116>",
   "Journeyman Cartographer's Sextant": "<:yellowsextant:562076541836722206>",
-  "Splinter of Chayula": "<:splinter:562627892090109962>",
   "Apprentice Cartographer's Sextant": "<:whitesextant:562075981830160385>",
+  "Splinter of Chayula": "<:chayula:562627892090109962>",
+  "Splinter of Tul": "<:tul:565040808927952917>",
+  "Splinter of Xoph": "<:xoph:565040999437565952>",
+  "Splinter of Uul-Netol": "<:uul:565041217650425856>",
+  "Splinter of Esh": "<:esh:565041104978706432>",
   "Vaal Orb": "<:vaal:562076451260858368>",
   "Regal Orb": "<:regal:562076374949691402>",
   "Gemcutter's Prism": "<:gcp:562076303658975242>",
@@ -120,10 +126,12 @@ function updateEmbed(){
       .setAuthor("Currency Table")
       .setTitle("**poe.ninja's Buy column**")
       .setURL("https://poe.ninja/challenge/currency")
-      .setFooter("Sourced from poe.ninja","https://poe.ninja/images/ninja-logo.png")
+      .setFooter("Sourced from poe.ninja, Created by Tinny & Judy","https://poe.ninja/images/ninja-logo.png")
       .setThumbnail("https://gamepedia.cursecdn.com/pathofexile_gamepedia/9/9c/Chaos_Orb_inventory_icon.png")
       .setTimestamp(getDate())
-      .setDescription(getTable());
+      .setDescription(getTable())
+      .addField("Sextants",getSextants(),false)
+      .addField("Splinters",getSplinters(),false);
       return embed;
 }
 
@@ -140,11 +148,29 @@ function populateCurrency(result) {
       var buyvalue = result[0].data.lines[i].receive.value.toFixed(1);
       }
       var name = result[0].data.lines[i].currencyTypeName;
-      currencyData.push(new CurrencyRow(name,buyvalue,sellvalue));
+      pushCurrency(name,buyvalue,sellvalue);
     }
   }
 }
 
+function pushCurrency(name,buyvalue,sellvalue){
+  switch(name) {
+    case "Splinter of Chayula":
+    case "Splinter of Tul":
+    case "Splinter of Xoph":
+    case "Splinter of Uul-Netol":
+    case "Splinter of Esh":
+      splinters.push(new CurrencyRow(name,buyvalue,sellvalue));
+      break;
+    case "Master Cartographer's Sextant":
+    case "Journeyman Cartographer's Sextant":
+    case "Apprentice Cartographer's Sextant":
+      sextants.push(new CurrencyRow(name,buyvalue,sellvalue));
+      break;
+    default:
+      currencyData.push(new CurrencyRow(name,buyvalue,sellvalue));
+  }
+}
 
 function calcValue(value) {
   result = (1 / parseFloat(value)).toFixed(1);
@@ -168,6 +194,38 @@ function getDate(){
 function getTable(){
   result = "";
   for (row of currencyData) {
+    var name = row.name;
+    if (currDict[name] != undefined) {
+      var paddedline =
+        row.buyvalue
+        + padString(row.buyvalue)
+        + "× <:chaos:562076109865484289>\u2001→\u20011.0\u2001× "
+        + currDict[name] + "\n";
+      result += paddedline;
+    }
+  }
+  return result;
+}
+
+function getSextants(){
+  result = "";
+  for (row of sextants) {
+    var name = row.name;
+    if (currDict[name] != undefined) {
+      var paddedline =
+        row.buyvalue
+        + padString(row.buyvalue)
+        + "× <:chaos:562076109865484289>\u2001→\u20011.0\u2001× "
+        + currDict[name] + "\n";
+      result += paddedline;
+    }
+  }
+  return result;
+}
+
+function getSplinters(){
+  result = "";
+  for (row of splinters) {
     var name = row.name;
     if (currDict[name] != undefined) {
       var paddedline =
