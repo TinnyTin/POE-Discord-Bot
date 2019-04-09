@@ -170,69 +170,73 @@ function getTable(){
   for (row of currencyData) {
     var name = row.name;
     if (currDict[name] != undefined) {
-      var paddedline = row.buyvalue + padString(row.buyvalue) + "× <:chaos:562076109865484289>   →     1.0 × " + currDict[name] + "\n"
-
+      var paddedline =
+        row.buyvalue
+        + padString(row.buyvalue)
+        + "× <:chaos:562076109865484289>\u2001→\u20011.0\u2001× "
+        + currDict[name] + "\n";
       result += paddedline;
     }
   }
-  console.log(result);
   return result;
 }
 
 function padString(str){
-
-  // Count digits, zeros and ones.
-  count = countDigits(str);
-  var numK = checkK(str);
-  var numOnes = countOnes(str);
-  var numLarge = countLWidth(str);
-
-  var numWhitespace = 7-count-numLarge;
-  // Pad according to number of digits, zeros and ones. All 3 have differing widths to pad.
-  var result = "\u2000".repeat(parseFloat(numWhitespace));
-  result += "\u200a\u200a".repeat(parseFloat(numOnes));
-  result += "\u200a".repeat(parseFloat(numLarge)*6);
-  result += "\u200a".repeat(parseFloat(numK));
+  // Count digits
+  var digits = countDigits(str);
+  var counts = countWidth(str);
+  var numWhitespace = 6-digits;
+  // Pad according to number of digits and differing widths.
+  var result = "\u2009".repeat(parseFloat(numWhitespace)*5); // Whitespace
+  result += "\u2002\u2009\u200a".repeat(parseFloat(counts[0])); // Zeros
+  result += "\u200a".repeat(parseFloat(counts[1])); // LargeWidth
+  result += "\u2009".repeat(parseFloat(counts[2]+counts[3])); // Twos and SmallWidth
+  result += "\u2009\u200a".repeat(parseFloat(counts[4])); // K's
+  result += "\u200a".repeat(parseFloat(counts[5])*4); // Ones
   return result;
 }
 
-function countLWidth(str){
-  var count = 0;
+function countWidth(str){
+  // [Largest -> Smallest]
+  // [Zeros,LargeWidth,Twos,SmallWidth,K,Ones]
+  var counts = [0,0,0,0,0,0];
   for (i = 0; i < 6; i++) {
-    if (!isNaN(parseFloat(str.charAt(i))) &&
-    (str.charAt(i) == '0'
-    || str.charAt(i) == '4'
-    || str.charAt(i) == '9'
-    || str.charAt(i) == '8' || str.charAt(i) == '6'
-    || str.charAt(i) == '2' || str.charAt(i) == '3')){
-        count++;
+    if (str.charAt(i)){
+      switch(str.charAt(i)) {
+        case '0':
+          counts[0]++;
+          break;
+        case '4':
+        case '6':
+        case '8':
+        case '9':
+          counts[1]++;
+          break;
+        case '2':
+          counts[2]++;
+          break;
+        case '3':
+        case '5':
+        case '7':
+          counts[3]++;
+          break;
+        case 'k':
+          counts[4]++;
+          break;
+        default:
+          counts[5]++;
+      };
     }
   }
-  return count;
-}
-
-function checkK(str){
-  var count = 0;
-  if (str.indexOf('k')) {
-    count = 1;
-  }
-  return count;
-}
-
- function countOnes(str){
-  var count = 0;
-  for (i = 0; i < 6; i++) {
-    if (!isNaN(parseFloat(str.charAt(i))) && (str.charAt(i) == '1')){
-        count++;
-    }
-  }
-  return count;
+  return counts;
 }
 
 function countDigits(str){
   var count = 0;
   for (i = 0; i < 6; i++) {
-    if (!isNaN(parseFloat(str.charAt(i))) || str.charAt(i) == 'k'){
+    if (!isNaN(parseFloat(str.charAt(i)))
+    || str.charAt(i) == 'k'){
+      if(str.charAt(i) == '0') count++;
         count++;
     }
   }
