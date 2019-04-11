@@ -101,17 +101,33 @@ client.on('guildMemberAdd', member => {
     else if (message.content.trim() == "!maprolling") {
       message.channel.send("https://i.imgur.com/Jje4H3A.png \n https://i.imgur.com/WqMWZc1.png");
     }
-    else if (message.content.trim() == "!maplayouts") {
+    else if (message.content.trim() == "!layouts") {
       message.channel.send("https://docs.google.com/document/d/1sExA-AnTbroJ-HN2neZiij5G4X9u2ENlC7m_zf1tqP8/edit");
     }
-    else if (message.content.trim() == "!ninja") {
+    else if (message.content.trim() == "!commands") {
+      message.channel.send(commandEmbed());
+    }
+    else if (message.content.trim() == "!buy") {
       ninjaAPI.update()
         .then((result) => {
           //console.log("Updated data, here are the results of the requests:", result[0].data.lines)
           populateCurrency(result);
-          message.channel.send(updateEmbed()).then((msg)=>{
+          message.channel.send(updateBuyEmbed()).then((msg)=>{
           setInterval(function(){
-            msg.edit(updateEmbed());
+            msg.edit(updateBuyEmbed());
+          }, minTimer);
+        })
+          return ninjaAPI.save();
+        })
+    }
+    else if (message.content.trim() == "!sell") {
+      ninjaAPI.update()
+        .then((result) => {
+          //console.log("Updated data, here are the results of the requests:", result[0].data.lines)
+          populateCurrency(result);
+          message.channel.send(updateSellEmbed()).then((msg)=>{
+          setInterval(function(){
+            msg.edit(updateSellEmbed("sell"));
           }, minTimer);
         })
           return ninjaAPI.save();
@@ -119,8 +135,22 @@ client.on('guildMemberAdd', member => {
     }
        });
 
+function commandEmbed(){
+  embed = new Discord.RichEmbed()
+  .setColor('AQUA')
+  .setTitle('A list of commands for this channel')
+  .setFooter('created by TinnyJu')
+  .setTimestamp(getDate())
+  .setDescription("!mobcount: A list of every map and their corresponding mob counts. \n" +
+  "!layouts : A list of layouts for maps between acts 1 to 10. \n" +
+  "!maprolling : A Tinny guide to rolling and sustaining maps. \n" +
+  "!hideouts : A list of highly desired hideouts, their rarity,\n and which maps to obtain them. \n" +
+  "!buy: A table of currencies that can be purchased with x chaos. \n" +
+  "!sell: A table of currencies that can be sold for x chaos.")
+  return embed;
+}
 
-function updateEmbed(){
+function updateBuyEmbed(){
       embed = new Discord.RichEmbed()
       .setColor('AQUA')
       .setAuthor("Currency Table")
@@ -129,9 +159,24 @@ function updateEmbed(){
       .setFooter("Sourced from poe.ninja, Created by Tinny & Judy","https://poe.ninja/images/ninja-logo.png")
       .setThumbnail("https://gamepedia.cursecdn.com/pathofexile_gamepedia/9/9c/Chaos_Orb_inventory_icon.png")
       .setTimestamp(getDate())
-      .setDescription(getTable())
-      .addField("Sextants",getSextants(),false)
-      .addField("Splinters",getSplinters(),false);
+      .setDescription(getBuyTable())
+      .addField("Sextants",getSextants(),false);
+      //.addField("Splinters",getSplinters(),false);
+      return embed;
+}
+
+function updateSellEmbed(str){
+      embed = new Discord.RichEmbed()
+      .setColor('AQUA')
+      .setAuthor("Currency Table")
+      .setTitle("**poe.ninja's Buy column**")
+      .setURL("https://poe.ninja/challenge/currency")
+      .setFooter("Sourced from poe.ninja, Created by Tinny & Judy","https://poe.ninja/images/ninja-logo.png")
+      .setThumbnail("https://gamepedia.cursecdn.com/pathofexile_gamepedia/9/9c/Chaos_Orb_inventory_icon.png")
+      .setTimestamp(getDate())
+      .setDescription(getSellTable())
+      .addField("Sextants",getSextants(),false);
+      //.addField("Splinters",getSplinters(),false);
       return embed;
 }
 
@@ -191,7 +236,7 @@ function getDate(){
 
 
 
-function getTable(){
+function getBuyTable(){
   result = "";
   for (row of currencyData) {
     var name = row.name;
@@ -201,6 +246,21 @@ function getTable(){
         + padString(row.buyvalue)
         + "× <:chaos:562076109865484289>\u2001→\u20011.0\u2001× "
         + currDict[name] + "\n";
+      result += paddedline;
+    }
+  }
+  return result;
+}
+
+function getSellTable(){
+  result = "";
+  for (row of currencyData) {
+    var name = row.name;
+    if (currDict[name] != undefined) {
+      var paddedline =
+        "1.0\u2001"
+        + "× <:chaos:562076109865484289>\u2001→ " + padString(row.sellvalue) +
+        row.sellvalue + "\u2001× "+ currDict[name] + "\n";
       result += paddedline;
     }
   }
@@ -243,8 +303,9 @@ function padString(str){
   // Count digits
   var digits = countDigits(str);
   var counts = countWidth(str);
-  var numWhitespace = 6-digits;
+  var numWhitespace = 7-digits;
   // Pad according to number of digits and differing widths.
+  console.log(numWhitespace);
   var result = "\u2009".repeat(parseFloat(numWhitespace)*5); // Whitespace
   result += "\u2002\u2009\u200a".repeat(parseFloat(counts[0])); // Zeros
   result += "\u200a".repeat(parseFloat(counts[1])); // LargeWidth
@@ -258,7 +319,7 @@ function countWidth(str){
   // [Largest -> Smallest]
   // [Zeros,LargeWidth,Twos,SmallWidth,K,Ones]
   var counts = [0,0,0,0,0,0];
-  for (i = 0; i < 6; i++) {
+  for (i = 0; i < 7; i++) {
     if (str.charAt(i)){
       switch(str.charAt(i)) {
         case '0':
@@ -291,7 +352,7 @@ function countWidth(str){
 
 function countDigits(str){
   var count = 0;
-  for (i = 0; i < 6; i++) {
+  for (i = 0; i < 7; i++) {
     if (!isNaN(parseFloat(str.charAt(i)))
     || str.charAt(i) == 'k'){
       if(str.charAt(i) == '0') count++;
