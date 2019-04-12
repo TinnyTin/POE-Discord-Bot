@@ -141,12 +141,14 @@ function commandEmbed(){
   .setTitle('A list of commands for this channel')
   .setFooter('created by TinnyJu')
   .setTimestamp(getDate())
-  .setDescription("!mobcount: A list of every map and their corresponding mob counts. \n" +
-  "!layouts : A list of layouts for maps between acts 1 to 10. \n" +
-  "!maprolling : A Tinny guide to rolling and sustaining maps. \n" +
-  "!hideouts : A list of highly desired hideouts, their rarity,\n and which maps to obtain them. \n" +
-  "!buy: A table of currencies that can be purchased with x chaos. \n" +
-  "!sell: A table of currencies that can be sold for x chaos.")
+  .setDescription("")
+  //.addField()
+  .addField("Spreadsheets", "[A list of every map and their corresponding mob counts.]" +
+  "(https://docs.google.com/spreadsheets/d/10ssi9lOJvDOo3G8Iq5xRyDv6-nbCJSxJhB5ANtaUn6w/htmlview?usp=sharing&sle=true) \n" +
+  "[A list of layouts for maps between acts 1 to 10.](https://docs.google.com/document/d/1sExA-AnTbroJ-HN2neZiij5G4X9u2ENlC7m_zf1tqP8/edit) \n")
+  .addField("Currency Tables", "!buy: A table of currencies that can be purchased with x chaos. \n" + "!sell: A table of currencies that can be sold for x chaos.")
+  .addField("Text", "!hideouts: A list of highly desired hideouts, their rarity, and which maps to obtain them.", true)
+
   return embed;
 }
 
