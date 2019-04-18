@@ -86,10 +86,10 @@ client.on('guildMemberAdd', member => {
 
 
   client.on("message", message => {
-    if (message.content.trim() == ("!hideout")){
-        message.channel.send("```" + "Celestial Hideout : The Shaper's Realm [T17] \n" +
+    if (message.content.trim() == ("!hideouts")){
+        message.channel.send("```css\n" + "Celestial Hideout : The Shaper's Realm [T17] \n" +
         "Alpline Hideout : Summit Map [T13] : Very Rare \n" +
-        "Divided Hideout : The Twilight Temple : Rare \n" +
+        "Divided Hideout : The Twilight Temple [Unique] : Rare \n" +
         "Haunted Hideout : Haunted Mansion Map [T2] : Extremely Rare \n" +
         "Sanguine Hideout : Crimson Temple Map [T13] : Extremely Rare \n" + "```");
               // Just add any case commands if you want to..
@@ -98,13 +98,16 @@ client.on('guildMemberAdd', member => {
        message.channel.send("**MAP MOB COUNT**: \n" +
 "https://docs.google.com/spreadsheets/d/10ssi9lOJvDOo3G8Iq5xRyDv6-nbCJSxJhB5ANtaUn6w/htmlview?usp=sharing&sle=true")
     }
-    else if (message.content.trim() == "!maprolling") {
-      message.channel.send("https://i.imgur.com/Jje4H3A.png \n https://i.imgur.com/WqMWZc1.png");
+    else if (message.content.trim() == "!poggairs") {
+      message.channel.send("***Poggairs sucks. ZeProtoge sucks.***");
     }
-    else if (message.content.trim() == "!layouts") {
-      message.channel.send("https://docs.google.com/document/d/1sExA-AnTbroJ-HN2neZiij5G4X9u2ENlC7m_zf1tqP8/edit");
+    else if (message.content.trim() == "!streamers") {
+      message.channel.send("_ _ \n**TinnyJu**: *<https://www.twitch.tv/tinnyju>*\n",{files: ["https://i.imgur.com/T7sMSLM.png"]}).then(
+        message.channel.send("_ _ \n**Tenkiei**: *<https://www.twitch.tv/tenkiei>*\n",{files: ["https://i.imgur.com/vXtDNyE.png"]})
+      )
+      ;
     }
-    else if (message.content.trim() == "!commands") {
+    else if (message.content.trim() == "!commands" || message.content.trim() == "!help") {
       message.channel.send(commandEmbed());
     }
     else if (message.content.trim() == "!buy") {
@@ -137,17 +140,28 @@ client.on('guildMemberAdd', member => {
 
 function commandEmbed(){
   embed = new Discord.RichEmbed()
-  .setColor('AQUA')
-  .setTitle('A list of commands for this channel')
+  .setColor('RED')
+  .setTitle("Welcome to TinnyJu's Server")
   .setFooter('created by TinnyJu')
-  .setTimestamp(getDate())
+  .setThumbnail("https://i.ibb.co/2hqcXh4/Kaito-Symbol.png")
+  //.setTimestamp(getDate())
   .setDescription("")
-  //.addField()
-  .addField("Spreadsheets", "[A list of every map and their corresponding mob counts.]" +
-  "(https://docs.google.com/spreadsheets/d/10ssi9lOJvDOo3G8Iq5xRyDv6-nbCJSxJhB5ANtaUn6w/htmlview?usp=sharing&sle=true) \n" +
-  "[A list of layouts for maps between acts 1 to 10.](https://docs.google.com/document/d/1sExA-AnTbroJ-HN2neZiij5G4X9u2ENlC7m_zf1tqP8/edit) \n")
-  .addField("Currency Tables", "!buy: A table of currencies that can be purchased with x chaos. \n" + "!sell: A table of currencies that can be sold for x chaos.")
-  .addField("Text", "!hideouts: A list of highly desired hideouts, their rarity, and which maps to obtain them.", true)
+  .addField("Tools We Use", "PAL2 Multi-addon launcher : [*Downloading this lets you get the rest below*](https://github.com/POE-Addon-Launcher/PAL2)\n"
+    +"PoE Trade Companion \n"
+    +"TradeMacro + Lutbot (logout)\n"
+    +"Path of Leveling\n"
+    +"Official Trade Site : *https://www.pathofexile.com/trade*\n"
+    +"PoE Services & Trading Discord : [***Invite***](https://discord.gg/FdJWs5)\n",false)
+  .addField("Commands", "**!hideouts** \n *A list of highly desired hideouts, their rarity, and which maps to obtain them.*\n" +
+  "**!streamers** \n *A list of partner streamers.*\n",false)
+  .addField("MS Paint", "Map Rolling : [*Imgur*](https://i.imgur.com/Jje4H3A.png) \n"
+    + "Who can drop maps? : [*Imgur*](https://i.imgur.com/WqMWZc1.png) \n"
+    + "Global vs Local modifiers : [*Imgur*](https://i.imgur.com/UF7uRWU.png)",false)
+  .addField("Spreadsheets",
+  "Mob Count of Maps: [*Google Spreadsheet*](https://docs.google.com/spreadsheets/d/10ssi9lOJvDOo3G8Iq5xRyDv6-nbCJSxJhB5ANtaUn6w/htmlview?usp=sharing&sle=true) \n" +
+  "E.Eternity: Layouts for Story Acts : [*Google Spreadsheet*](https://docs.google.com/document/d/1sExA-AnTbroJ-HN2neZiij5G4X9u2ENlC7m_zf1tqP8/edit) \n" +
+  "Turi's Delve Cheat Sheet : [*Google Spreadsheet*](https://docs.google.com/spreadsheets/d/14-VBdK4Izh9lU9_BP1eqyht2JXL17wFfF8TAz24Ls0g/edit#gid=788135518) \n" +
+  "Lab Enchant Statistics : [*Google Spreadsheet*](https://docs.google.com/spreadsheets/d/1QolNQHAzQ44NHzYB8W1cjN6Cf7JPeNsEUJKY1Y02Sf8/edit?usp=sharing)",false)
 
   return embed;
 }
