@@ -33,7 +33,9 @@ let sextants = [];
 let splinters = [];
 let dataReady = false;
 
-var minTimer = 1000 * 60 * 15; //15 min
+
+
+var minTimer = 1000 * 60 * (1/30); //15 min
 // Dictionary with currency name to custom emoji id. CurrencyName:Emoji
 var currDict = {
   "Mirror of Kalandra": "<:mirror:562221382394445845>",
@@ -86,6 +88,7 @@ client.on('guildMemberAdd', member => {
 
 
   client.on("message", message => {
+  const yum = client.emojis.find(emoji => emoji.name === "tinnyjHappy");
     if (message.content.trim() == ("!hideouts")){
         message.channel.send("```css\n" + "Celestial Hideout : The Shaper's Realm [T17] \n" +
         "Alpline Hideout : Summit Map [T13] : Very Rare \n" +
@@ -101,6 +104,10 @@ client.on('guildMemberAdd', member => {
     else if (message.content.trim() == "!poggairs") {
       message.channel.send("***Poggairs sucks. ZeProtoge sucks.***");
     }
+
+    else if (message.content.trim() == "!tinny") {
+      message.channel.send("***Tinny sucks ass***");
+    }
     else if (message.content.trim() == "!streamers") {
       message.channel.send("_ _ \n**TinnyJu**: *<https://www.twitch.tv/tinnyju>*\n",{files: ["https://i.imgur.com/T7sMSLM.png"]}).then(
         message.channel.send("_ _ \n**Tenkiei**: *<https://www.twitch.tv/tenkiei>*\n",{files: ["https://i.imgur.com/vXtDNyE.png"]})
@@ -115,19 +122,23 @@ client.on('guildMemberAdd', member => {
         .then((result) => {
           //console.log("Updated data, here are the results of the requests:", result[0].data.lines)
           populateCurrency(result);
+          message.delete();
           message.channel.send(updateBuyEmbed()).then((msg)=>{
+          //if (message.react == yum){
           setInterval(function(){
             msg.edit(updateBuyEmbed());
           }, minTimer);
         })
           return ninjaAPI.save();
         })
-    }
+      }
+
     else if (message.content.trim() == "!sell") {
       ninjaAPI.update()
         .then((result) => {
           //console.log("Updated data, here are the results of the requests:", result[0].data.lines)
           populateCurrency(result);
+          message.delete();
           message.channel.send(updateSellEmbed()).then((msg)=>{
           setInterval(function(){
             msg.edit(updateSellEmbed("sell"));
@@ -137,6 +148,7 @@ client.on('guildMemberAdd', member => {
         })
     }
        });
+
 
 function commandEmbed(){
   embed = new Discord.RichEmbed()
