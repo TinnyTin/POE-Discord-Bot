@@ -122,12 +122,12 @@ client.on('guildMemberAdd', member => {
         .then((result) => {
           //console.log("Updated data, here are the results of the requests:", result[0].data.lines)
           populateCurrency(result);
+          console.log("Data size: "+ currencyData.length);
           message.delete();
           message.channel.send(updateBuyEmbed()).then((msg)=>{
-          //if (message.react == yum){
-          setInterval(function(){
-            msg.edit(updateBuyEmbed());
-          }, minTimer);
+          // setInterval(function(){
+          //   msg.edit(updateBuyEmbed());
+          // }, minTimer);
         })
           return ninjaAPI.save();
         })
@@ -138,11 +138,12 @@ client.on('guildMemberAdd', member => {
         .then((result) => {
           //console.log("Updated data, here are the results of the requests:", result[0].data.lines)
           populateCurrency(result);
+          console.log("Data size: "+ currencyData.length);
           message.delete();
           message.channel.send(updateSellEmbed()).then((msg)=>{
-          setInterval(function(){
-            msg.edit(updateSellEmbed("sell"));
-          }, minTimer);
+          // setInterval(function(){
+          //   msg.edit(updateSellEmbed());
+          // }, minTimer);
         })
           return ninjaAPI.save();
         })
@@ -182,28 +183,28 @@ function updateBuyEmbed(){
       embed = new Discord.RichEmbed()
       .setColor('AQUA')
       .setAuthor("Currency Table")
-      .setTitle("**poe.ninja's Buy column**")
+      .setTitle("**poe.ninja's BUY column**")
       .setURL("https://poe.ninja/challenge/currency")
       .setFooter("Sourced from poe.ninja, Created by Tinny & Judy","https://poe.ninja/images/ninja-logo.png")
       .setThumbnail("https://gamepedia.cursecdn.com/pathofexile_gamepedia/9/9c/Chaos_Orb_inventory_icon.png")
       .setTimestamp(getDate())
-      .setDescription(getBuyTable())
-      .addField("Sextants",getSextants(),false);
+      .setDescription(getBuyTable());
+      //.addField("Sextants",getSextants(),false);
       //.addField("Splinters",getSplinters(),false);
       return embed;
 }
 
-function updateSellEmbed(str){
+function updateSellEmbed(){
       embed = new Discord.RichEmbed()
       .setColor('AQUA')
       .setAuthor("Currency Table")
-      .setTitle("**poe.ninja's Buy column**")
+      .setTitle("**poe.ninja's SELL column**")
       .setURL("https://poe.ninja/challenge/currency")
       .setFooter("Sourced from poe.ninja, Created by Tinny & Judy","https://poe.ninja/images/ninja-logo.png")
       .setThumbnail("https://gamepedia.cursecdn.com/pathofexile_gamepedia/9/9c/Chaos_Orb_inventory_icon.png")
       .setTimestamp(getDate())
-      .setDescription(getSellTable())
-      .addField("Sextants",getSextants(),false);
+      .setDescription(getSellTable());
+      //.addField("Sextants",getSextants(),false);
       //.addField("Splinters",getSplinters(),false);
       return embed;
 }
@@ -212,10 +213,9 @@ function populateCurrency(result) {
   var i;
   for (i = 0; i < result[0].data.lines.length; i++) {
     if (result[0].data.lines[i].pay && result[0].data.lines[i].receive) {
-      var sellvalue = calcValue(result[0].data.lines[i].pay.value);
+      var sellvalue = kFormatter(calcValue(result[0].data.lines[i].pay.value));
       if (i == 0) {
-        var receive = (parseFloat(result[0].data.lines[i].receive.value)/100)*100/ 1.0e+3;
-        var buyvalue = receive.toFixed(1) + "k";
+        var buyvalue = kFormatter(result[0].data.lines[i].receive.value);
       }
       else {
       var buyvalue = result[0].data.lines[i].receive.value.toFixed(1);
@@ -226,6 +226,7 @@ function populateCurrency(result) {
   }
 }
 
+// Sift and Push CurrencyRow objects to their appropriate data tables
 function pushCurrency(name,buyvalue,sellvalue){
   switch(name) {
     case "Splinter of Chayula":
@@ -233,15 +234,27 @@ function pushCurrency(name,buyvalue,sellvalue){
     case "Splinter of Xoph":
     case "Splinter of Uul-Netol":
     case "Splinter of Esh":
-      splinters.push(new CurrencyRow(name,buyvalue,sellvalue));
+      updateCurrency(name,buyvalue,sellvalue,splinters);
       break;
     case "Master Cartographer's Sextant":
     case "Journeyman Cartographer's Sextant":
     case "Apprentice Cartographer's Sextant":
-      sextants.push(new CurrencyRow(name,buyvalue,sellvalue));
+      updateCurrency(name,buyvalue,sellvalue,sextants);
       break;
     default:
-      currencyData.push(new CurrencyRow(name,buyvalue,sellvalue));
+      updateCurrency(name,buyvalue,sellvalue,currencyData);
+  }
+}
+
+// Update CurrencyRow if duplicate exists, else push new CurrencyRow to data
+function updateCurrency(name,buyvalue,sellvalue,data){
+  var found = data.find(row => row.name == name);
+  if(found === undefined){
+    data.push(new CurrencyRow(name,buyvalue,sellvalue));
+  }
+  else{
+    row.buyvalue = buyvalue;
+    row.sellvalue = sellvalue;
   }
 }
 
@@ -249,7 +262,6 @@ function calcValue(value) {
   result = (1 / parseFloat(value)).toFixed(1);
   return result;
 }
-
 
 function getDate(){
   var d = new Date,
@@ -284,6 +296,7 @@ function getSellTable(){
   result = "";
   for (row of currencyData) {
     var name = row.name;
+
     if (currDict[name] != undefined) {
       var paddedline =
         "1.0\u2001"
@@ -295,14 +308,18 @@ function getSellTable(){
   return result;
 }
 
-function getSextants(){
+function getSextants(str){
   result = "";
   for (row of sextants) {
+    var value = row.buyvalue;
+    if(str == "sell"){
+      value = row.sellvalue;
+    }
     var name = row.name;
     if (currDict[name] != undefined) {
       var paddedline =
-        row.buyvalue
-        + padString(row.buyvalue)
+        value
+        + padString(value)
         + "× <:chaos:562076109865484289>\u2001→\u20011.0\u2001× "
         + currDict[name] + "\n";
       result += paddedline;
@@ -314,11 +331,15 @@ function getSextants(){
 function getSplinters(){
   result = "";
   for (row of splinters) {
+    var value = row.buyvalue;
+    if(str == "sell"){
+      value = row.sellvalue;
+    }
     var name = row.name;
     if (currDict[name] != undefined) {
       var paddedline =
-        row.buyvalue
-        + padString(row.buyvalue)
+        value
+        + padString(value)
         + "× <:chaos:562076109865484289>\u2001→\u20011.0\u2001× "
         + currDict[name] + "\n";
       result += paddedline;
@@ -327,13 +348,16 @@ function getSplinters(){
   return result;
 }
 
+function kFormatter(num){
+    return Math.abs(num) > 999 ? Math.sign(num)*((Math.abs(num)/1000).toFixed(1)) + 'k' : Math.sign(num)*Math.abs(num)
+}
+
 function padString(str){
   // Count digits
   var digits = countDigits(str);
   var counts = countWidth(str);
   var numWhitespace = 7-digits;
   // Pad according to number of digits and differing widths.
-  console.log(numWhitespace);
   var result = "\u2009".repeat(parseFloat(numWhitespace)*5); // Whitespace
   result += "\u2002\u2009\u200a".repeat(parseFloat(counts[0])); // Zeros
   result += "\u200a".repeat(parseFloat(counts[1])); // LargeWidth
@@ -343,10 +367,11 @@ function padString(str){
   return result;
 }
 
-function countWidth(str){
+function countWidth(string){
   // [Largest -> Smallest]
   // [Zeros,LargeWidth,Twos,SmallWidth,K,Ones]
   var counts = [0,0,0,0,0,0];
+  var str = string.toString();
   for (i = 0; i < 7; i++) {
     if (str.charAt(i)){
       switch(str.charAt(i)) {
@@ -379,11 +404,12 @@ function countWidth(str){
 }
 
 function countDigits(str){
+  var string = str.toString();
   var count = 0;
   for (i = 0; i < 7; i++) {
-    if (!isNaN(parseFloat(str.charAt(i)))
-    || str.charAt(i) == 'k'){
-      if(str.charAt(i) == '0') count++;
+    if (!isNaN(parseFloat(string.charAt(i)))
+    || string.charAt(i) == 'k'){
+      if(string.charAt(i) == '0') count++;
         count++;
     }
   }
