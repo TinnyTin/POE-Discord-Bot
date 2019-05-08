@@ -312,9 +312,9 @@ function getSellTable(){
 }
 
 function getSextants(){
+  result = "";
     for (row of sextants) {
       var value = row.buyvalue;
-
       var name = row.name;
       if (currDict[name] != undefined) {
         var paddedline =
