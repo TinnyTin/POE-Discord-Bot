@@ -65,7 +65,6 @@ var currDict = {
 
 client.on('ready', () => {
     console.log("Connected as " + client.user.tag)
-
 })
 
 // Get your bot's secret token from:
@@ -125,9 +124,9 @@ client.on('guildMemberAdd', member => {
           console.log("Data size: "+ currencyData.length);
           message.delete();
           message.channel.send(updateBuyEmbed()).then((msg)=>{
-          // setInterval(function(){
-          //   msg.edit(updateBuyEmbed());
-          // }, minTimer);
+          setInterval(function(){
+            msg.edit(updateBuyEmbed());
+          }, minTimer);
         })
           return ninjaAPI.save();
         })
@@ -188,9 +187,9 @@ function updateBuyEmbed(){
       .setFooter("Sourced from poe.ninja, Created by Tinny & Judy","https://poe.ninja/images/ninja-logo.png")
       .setThumbnail("https://gamepedia.cursecdn.com/pathofexile_gamepedia/9/9c/Chaos_Orb_inventory_icon.png")
       .setTimestamp(getDate())
-      .setDescription(getBuyTable());
-      //.addField("Sextants",getSextants(),false);
-      //.addField("Splinters",getSplinters(),false);
+      .setDescription(getBuyTable())
+      .addField("Sextants",getSextants(),false)
+      .addField("Splinters",getSplinters(),false);
       return embed;
 }
 
@@ -203,8 +202,9 @@ function updateSellEmbed(){
       .setFooter("Sourced from poe.ninja, Created by Tinny & Judy","https://poe.ninja/images/ninja-logo.png")
       .setThumbnail("https://gamepedia.cursecdn.com/pathofexile_gamepedia/9/9c/Chaos_Orb_inventory_icon.png")
       .setTimestamp(getDate())
-      .setDescription(getSellTable());
-      //.addField("Sextants",getSextants(),false);
+      .setDescription(getSellTable())
+      console.log(getSellSextants())
+      .addField("Sextants", getSellSextants("sell"),false);
       //.addField("Splinters",getSplinters(),false);
       return embed;
 }
@@ -213,12 +213,15 @@ function populateCurrency(result) {
   var i;
   for (i = 0; i < result[0].data.lines.length; i++) {
     if (result[0].data.lines[i].pay && result[0].data.lines[i].receive) {
-      var sellvalue = kFormatter(calcValue(result[0].data.lines[i].pay.value));
+
       if (i == 0) {
         var buyvalue = kFormatter(result[0].data.lines[i].receive.value);
+        var sellvalue = kFormatter(calcValue(result[0].data.lines[i].pay.value));
       }
       else {
       var buyvalue = result[0].data.lines[i].receive.value.toFixed(1);
+      var sellvalue = calcValue(result[0].data.lines[i].pay.value);
+      console.log(sellvalue);
       }
       var name = result[0].data.lines[i].currencyTypeName;
       pushCurrency(name,buyvalue,sellvalue);
@@ -296,7 +299,6 @@ function getSellTable(){
   result = "";
   for (row of currencyData) {
     var name = row.name;
-
     if (currDict[name] != undefined) {
       var paddedline =
         "1.0\u2001"
@@ -305,28 +307,59 @@ function getSellTable(){
       result += paddedline;
     }
   }
+  //console.log(result);
   return result;
 }
 
 function getSextants(str){
   result = "";
-  for (row of sextants) {
-    var value = row.buyvalue;
-    if(str == "sell"){
-      value = row.sellvalue;
+    for (row of sextants) {
+      var value = row.buyvalue;
+      if(str == "sell"){
+        value = row.sellvalue;
+      }
+      var name = row.name;
+      if (currDict[name] != undefined) {
+        var paddedline =
+          value
+          + padString(value)
+          + "× <:chaos:562076109865484289>\u2001→\u20011.0\u2001× "
+          + currDict[name] + "\n";
+        result += paddedline;
+      }
     }
-    var name = row.name;
-    if (currDict[name] != undefined) {
-      var paddedline =
-        value
-        + padString(value)
-        + "× <:chaos:562076109865484289>\u2001→\u20011.0\u2001× "
-        + currDict[name] + "\n";
-      result += paddedline;
-    }
+    return result;
   }
-  return result;
-}
+
+function getSellSextants(str){
+  //   result = "";
+  //   var value = row.sellvalue;
+  //   var name = row.name;
+  //   if (currDict[name] != undefined) {
+  //     var paddedline =
+  //       "1.0    × <:chaos:562076109865484289>\u2001→\u2001" +
+  //       value + padString(value) +"\u2001× " + currDict[name] + "\n";
+  //     result += paddedline;
+  //   }
+  // return result;
+  result = "";
+    for (row of sextants) {
+      var value = row.buyvalue;
+      if(str == "sell"){
+        value = row.sellvalue;
+      }
+      var name = row.name;
+      if (currDict[name] != undefined) {
+        var paddedline =
+              "1.0    × <:chaos:562076109865484289>\u2001→\u2001" +
+              value + padString(value) +"\u2001× " + currDict[name] + "\n";
+            result += paddedline;
+        result += paddedline;
+      }
+    }
+    console.log(result);
+    return result;
+  }
 
 function getSplinters(){
   result = "";
