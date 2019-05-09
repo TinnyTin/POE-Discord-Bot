@@ -119,15 +119,7 @@ client.on('guildMemberAdd', member => {
     else if (message.content.trim() == "!buy") {
       ninjaAPI.update()
         .then((result) => {
-          //console.log("Updated data, here are the results of the requests:", result[0].data.lines)
-          populateCurrency(result);
-          console.log("Data size: "+ currencyData.length);
-          message.delete();
-          message.channel.send(updateBuyEmbed()).then((msg)=>{
-          setInterval(function(){
-            msg.edit(updateBuyEmbed());
-          }, minTimer);
-        })
+          updateTable(message,result,"BUY");
           return ninjaAPI.save();
         })
       }
@@ -135,19 +127,38 @@ client.on('guildMemberAdd', member => {
     else if (message.content.trim() == "!sell") {
       ninjaAPI.update()
         .then((result) => {
-          //console.log("Updated data, here are the results of the requests:", result[0].data.lines)
-          populateCurrency(result);
-          console.log("Data size: "+ currencyData.length);
-          message.delete();
-          message.channel.send(updateSellEmbed()).then((msg)=>{
-          setInterval(function(){
-          msg.edit(updateSellEmbed());
-          }, minTimer);
-        })
+          updateTable(message,result,"SELL");
           return ninjaAPI.save();
         })
     }
        });
+
+function updateTable(message,result,col){
+      populateCurrency(result);
+      message.channel.send(updateEmbed(col)).then((msg)=>{
+      setInterval(function(){
+        msg.edit(updateEmbed(col));
+      }, minTimer);
+      msg.react('👍').then(() => msg.react('👎'));
+      const filter = (reaction, user) => {
+        return ['👍', '👎'].includes(reaction.emoji.name) && user.id !== msg.author.id;
+      };
+      msg.awaitReactions(filter, { max: 1})
+        .then(collected => {
+          const reaction = collected.first();
+          var u = reaction.users.find(element => element.username != "Kaito");
+          if (reaction.emoji.name === '👍') {
+              msg.reactions.first().remove(u);
+          }
+          else {
+              msg.reactions.first().remove(u);
+          }
+        })
+        .catch(collected => {
+          console.log('ERROR: AwaitReactions failed.')
+        });
+    })
+}
 
 
 function commandEmbed(){
@@ -178,33 +189,18 @@ function commandEmbed(){
   return embed;
 }
 
-function updateBuyEmbed(){
+function updateEmbed(str){
       embed = new Discord.RichEmbed()
       .setColor('AQUA')
       .setAuthor("Currency Table")
-      .setTitle("**poe.ninja's BUY column**")
+      .setTitle("**poe.ninja's " + str + " column**")
       .setURL("https://poe.ninja/challenge/currency")
       .setFooter("Sourced from poe.ninja, Created by Tinny & Judy","https://poe.ninja/images/ninja-logo.png")
       .setThumbnail("https://gamepedia.cursecdn.com/pathofexile_gamepedia/9/9c/Chaos_Orb_inventory_icon.png")
       .setTimestamp(getDate())
-      .setDescription(getBuyTable())
-      .addField("Sextants", getSextants("buy"),false)
-      .addField("Splinters", getSplinters("buy"),false);
-      return embed;
-}
-
-function updateSellEmbed(){
-      embed = new Discord.RichEmbed()
-      .setColor('AQUA')
-      .setAuthor("Currency Table")
-      .setTitle("**poe.ninja's SELL column**")
-      .setURL("https://poe.ninja/challenge/currency")
-      .setFooter("Sourced from poe.ninja, Created by Tinny & Judy","https://poe.ninja/images/ninja-logo.png")
-      .setThumbnail("https://gamepedia.cursecdn.com/pathofexile_gamepedia/9/9c/Chaos_Orb_inventory_icon.png")
-      .setTimestamp(getDate())
-      .setDescription(getSellTable())
-      .addField("Sextants", getSextants("sell"),false)
-      .addField("Splinters",getSplinters("sell"),false);
+      .setDescription(getTable(str))
+      .addField("Sextants", getSextants(str),false)
+      .addField("Splinters", getSplinters(str),false);
       return embed;
 }
 
@@ -220,7 +216,6 @@ function populateCurrency(result) {
       else {
       var buyvalue = result[0].data.lines[i].receive.value.toFixed(1);
       var sellvalue = calcValue(result[0].data.lines[i].pay.value);
-      console.log(sellvalue);
       }
       var name = result[0].data.lines[i].currencyTypeName;
       pushCurrency(name,buyvalue,sellvalue);
@@ -278,35 +273,27 @@ function getDate(){
 
 
 
-function getBuyTable(){
+function getTable(str){
   result = "";
   for (row of currencyData) {
     var name = row.name;
+    var value = row.buyvalue;
+    if(str == "SELL") value = row.sellvalue;
     if (currDict[name] != undefined) {
       var paddedline =
-        row.buyvalue
-        + padString(row.buyvalue)
+        value
+        + padString(value)
         + "× <:chaos:562076109865484289>\u2001→\u20011.0\u2001× "
         + currDict[name] + "\n";
+      if(str == "SELL"){
+        paddedline =
+          "1.0\u2001"
+          + "×  " + currDict[name] + " \u2001→ " + padString(value) +
+          value + "\u2001× "+ "<:chaos:562076109865484289>" + "\n";
+      }
       result += paddedline;
     }
   }
-  return result;
-}
-
-function getSellTable(){
-  result = "";
-  for (row of currencyData) {
-    var name = row.name;
-    if (currDict[name] != undefined) {
-      var paddedline =
-        "1.0\u2001"
-        + "×  " + currDict[name] + " \u2001→ " + padString(row.sellvalue) +
-        row.sellvalue + "\u2001× "+ "<:chaos:562076109865484289>" + "\n";
-      result += paddedline;
-    }
-  }
-  //console.log(result);
   return result;
 }
 
@@ -327,7 +314,7 @@ function getSextants(str){
             "1.0\u2001"
             + "×  " + currDict[name] + " \u2001→ " + padString(value) +
             value + "\u2001× "+ "<:chaos:562076109865484289>" + "\n";
-            
+
           }
         result += paddedline;
       }
