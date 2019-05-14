@@ -65,6 +65,12 @@ var currDict = {
 
 client.on('ready', () => {
     console.log("Connected as " + client.user.tag)
+
+    // ninjaAPI.update()
+    // .then((result) => {
+    //   updateTable(message,result,"BUY");
+    //   return ninjaAPI.save();
+    // })
 })
 
 // Get your bot's secret token from:
@@ -87,7 +93,6 @@ client.on('guildMemberAdd', member => {
 
 
   client.on("message", message => {
-  const yum = client.emojis.find(emoji => emoji.name === "tinnyjHappy");
     if (message.content.trim() == ("!hideouts")){
         message.channel.send("```css\n" + "Celestial Hideout : The Shaper's Realm [T17] \n" +
         "Alpline Hideout : Summit Map [T13] : Very Rare \n" +
