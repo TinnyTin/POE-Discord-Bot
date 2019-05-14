@@ -65,12 +65,13 @@ var currDict = {
 
 client.on('ready', () => {
     console.log("Connected as " + client.user.tag)
+    var kaitosWorld = client.channels.get("568269774728069140");
+    ninjaAPI.update()
+      .then((result) => {
+        updateTable("",result,"SELL");
+        return ninjaAPI.save();
+      })
 
-    // ninjaAPI.update()
-    // .then((result) => {
-    //   updateTable(message,result,"BUY");
-    //   return ninjaAPI.save();
-    // })
 })
 
 // Get your bot's secret token from:
@@ -121,13 +122,13 @@ client.on('guildMemberAdd', member => {
     else if (message.content.trim() == "!commands" || message.content.trim() == "!help") {
       message.channel.send(commandEmbed());
     }
-    else if (message.content.trim() == "!buy") {
-      ninjaAPI.update()
-        .then((result) => {
-          updateTable(message,result,"BUY");
-          return ninjaAPI.save();
-        })
-      }
+//    else if (message.content.trim() == "!buy") {
+//      ninjaAPI.update()
+//        .then((result) => {
+//          updateTable(message,result,"BUY");
+//          return ninjaAPI.save();
+//        })
+//      }
 
     else if (message.content.trim() == "!sell") {
       ninjaAPI.update()
@@ -138,31 +139,42 @@ client.on('guildMemberAdd', member => {
     }
        });
 
-function updateTable(message,result,col){
+function updateTable(m,result,col){
       populateCurrency(result);
-      message.channel.send(updateEmbed(col)).then((msg)=>{
-      setInterval(function(){
-        msg.edit(updateEmbed(col));
-      }, minTimer);
-      msg.react('👍').then(() => msg.react('👎'));
-      const filter = (reaction, user) => {
-        return ['👍', '👎'].includes(reaction.emoji.name) && user.id !== msg.author.id;
-      };
-      msg.awaitReactions(filter, { max: 1})
-        .then(collected => {
-          const reaction = collected.first();
-          var u = reaction.users.find(element => element.username != "Kaito");
-          if (reaction.emoji.name === '👍') {
-              msg.reactions.first().remove(u);
-          }
-          else {
-              msg.reactions.first().remove(u);
-          }
-        })
-        .catch(collected => {
-          console.log('ERROR: AwaitReactions failed.')
-        });
-    })
+      var kaitosWorld = client.channels.get("568269774728069140");
+      kaitosWorld.fetchMessage("577804534298968064")
+      .then(message =>
+        message.edit(updateEmbed(col)).then((msg)=>{
+        // setInterval(function(){
+        //   kaitoMsg.then(mes =>
+        //     mes.edit(updateEmbed(col)));
+        // }, minTimer);
+        message.react('👍').then(() => msg.react('👎'));
+        const filter = (reaction, user) => {
+          return ['👍', '👎'].includes(reaction.emoji.name) && user.id !== msg.author.id;
+        };
+        message.awaitReactions(filter, { max: 1})
+          .then(collected => {
+            const reaction = collected.first();
+            var u = reaction.users.find(element => element.username != "Kaito");
+            if (reaction.emoji.name === '👍') {
+                msg.reactions.first().remove(u);
+                //updateTable(kaitoMsg,result,"BUY");
+            }
+            else {
+                msg.reactions.first().remove(u);
+                //updateTable(kaitoMsg,result,"SELL");
+            }
+          })
+          .catch(collected => {
+            console.log('ERROR: AwaitReactions failed.')
+          });
+
+      })
+      )
+
+
+
 }
 
 
