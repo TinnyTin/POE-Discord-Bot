@@ -130,13 +130,13 @@ client.on('guildMemberAdd', member => {
 //        })
 //      }
 
-    else if (message.content.trim() == "!sell") {
-      ninjaAPI.update()
-        .then((result) => {
-          updateTable(message,result,"SELL");
-          return ninjaAPI.save();
-        })
-    }
+    // else if (message.content.trim() == "!sell") {
+    //   ninjaAPI.update()
+    //     .then((result) => {
+    //       updateTable(message,result,"SELL");
+    //       return ninjaAPI.save();
+    //     })
+    // }
        });
 
 function updateTable(m,result,col){
@@ -145,13 +145,10 @@ function updateTable(m,result,col){
       kaitosWorld.fetchMessage("577804534298968064")
       .then(message =>
         message.edit(updateEmbed(col)).then((msg)=>{
-        // setInterval(function(){
-        //   kaitoMsg.then(mes =>
-        //     mes.edit(updateEmbed(col)));
-        // }, minTimer);
-        message.react('👍').then(() => msg.react('👎'));
+         setInterval(function(){
+        message.react('👍').then(() => message.react('👎'));
         const filter = (reaction, user) => {
-          return ['👍', '👎'].includes(reaction.emoji.name) && user.id !== msg.author.id;
+          return ['👍', '👎'].includes(reaction.emoji.name) && user.id !== message.author.id;
         };
         message.awaitReactions(filter, { max: 1})
           .then(collected => {
@@ -159,11 +156,11 @@ function updateTable(m,result,col){
             var u = reaction.users.find(element => element.username != "Kaito");
             if (reaction.emoji.name === '👍') {
                 msg.reactions.first().remove(u);
-                //updateTable(kaitoMsg,result,"BUY");
+                updateTable(message,result,"BUY");
             }
-            else {
+            else if (reaction.emoji.name === '👎') {
                 msg.reactions.first().remove(u);
-                //updateTable(kaitoMsg,result,"SELL");
+                updateTable(message,result,"SELL");
             }
           })
           .catch(collected => {
@@ -171,10 +168,8 @@ function updateTable(m,result,col){
           });
 
       })
+              }, minTimer)
       )
-
-
-
 }
 
 
