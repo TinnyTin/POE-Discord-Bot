@@ -35,7 +35,7 @@ let dataReady = false;
 
 
 
-var minTimer = 1000 * 60 * (1/30); //15 min
+var minTimer = 1000 * 60 * 30; //15 min
 // Dictionary with currency name to custom emoji id. CurrencyName:Emoji
 var currDict = {
   "Mirror of Kalandra": "<:mirror:562221382394445845>",
@@ -68,7 +68,7 @@ client.on('ready', () => {
     var kaitosWorld = client.channels.get("568269774728069140");
     ninjaAPI.update()
       .then((result) => {
-        updateTable("",result,"SELL");
+        updateTable("",result,"BUY");
         return ninjaAPI.save();
       })
 
@@ -139,36 +139,47 @@ client.on('guildMemberAdd', member => {
     // }
        });
 
+
+ client.on('messageReactionAdd', (reaction, user) => {
+     if(reaction.emoji.name === "👎") {
+         //console.log(reaction.users);
+     }
+ });
+
 function updateTable(m,result,col){
       populateCurrency(result);
       var kaitosWorld = client.channels.get("568269774728069140");
       kaitosWorld.fetchMessage("577804534298968064")
       .then(message =>
         message.edit(updateEmbed(col)).then((msg)=>{
-         setInterval(function(){
         message.react('👍').then(() => message.react('👎'));
         const filter = (reaction, user) => {
-          return ['👍', '👎'].includes(reaction.emoji.name) && user.id !== message.author.id;
+          return ['👍', '👎'].includes(reaction.emoji.name) && user.id != message.author.id;
         };
         message.awaitReactions(filter, { max: 1})
           .then(collected => {
             const reaction = collected.first();
-            var u = reaction.users.find(element => element.username != "Kaito");
+
+            var u = reaction.users.find(element => element.bot == false);
+            //console.log(u);
             if (reaction.emoji.name === '👍') {
                 msg.reactions.first().remove(u);
+
                 updateTable(message,result,"BUY");
             }
-            else if (reaction.emoji.name === '👎') {
-                msg.reactions.first().remove(u);
+            if (reaction.emoji.name === '👎') {
+              //console.log(msg.reactions.find(element => element._emoji.name === '👎'));
+
+              msg.reactions.find(element => element._emoji.name === '👎').remove(u);
+
+                //msg.reactions.first().remove(u);
                 updateTable(message,result,"SELL");
             }
           })
           .catch(collected => {
             console.log('ERROR: AwaitReactions failed.')
           });
-
       })
-              }, minTimer)
       )
 }
 
