@@ -221,9 +221,9 @@ function updateEmbed(str){
       .setFooter("Sourced from poe.ninja, Created by Tinny & Judy","https://poe.ninja/images/ninja-logo.png")
       .setThumbnail("https://gamepedia.cursecdn.com/pathofexile_gamepedia/9/9c/Chaos_Orb_inventory_icon.png")
       .setTimestamp(getDate())
-      .setDescription(getTable(str))
-      .addField("Sextants", getSextants(str),false)
-      .addField("Splinters", getSplinters(str),false);
+      .setDescription(getTable(str.toUpperCase()))
+      .addField("Sextants", getSextants(str.toUpperCase()),false)
+      .addField("Splinters", getSplinters(str.toUpperCase()),false);
       return embed;
 }
 
@@ -301,14 +301,14 @@ function getTable(str){
   for (row of currencyData) {
     var name = row.name;
     var value = row.buyvalue;
-    if(str == "SELL") value = row.sellvalue;
+    if(str.toUpperCase() == "SELL") value = row.sellvalue;
     if (currDict[name] != undefined) {
       var paddedline =
         value
         + padString(value)
         + "× <:chaos:562076109865484289>\u2001→\u20011.0\u2001× "
         + currDict[name] + "\n";
-      if(str == "SELL"){
+      if(str.toUpperCase() == "SELL"){
         paddedline =
           "1.0\u2001"
           + "×  " + currDict[name] + " \u2001→ " + padString(value) +
@@ -324,7 +324,7 @@ function getSextants(str){
   result = "";
     for (row of sextants) {
       var value = row.buyvalue;
-      if(str == "sell") value = row.sellvalue;
+      if(str.toUpperCase() == "SELL") value = row.sellvalue;
       var name = row.name;
       if (currDict[name] != undefined) {
         var paddedline =
@@ -332,7 +332,7 @@ function getSextants(str){
           + padString(value)
           + "× <:chaos:562076109865484289>\u2001→\u20011.0\u2001× "
           + currDict[name] + "\n";
-          if(str == "sell"){
+          if(str.toUpperCase() == "SELL"){
             paddedline =
             "1.0\u2001"
             + "×  " + currDict[name] + " \u2001→ " + padString(value) +
@@ -350,7 +350,7 @@ function getSplinters(str){
   result = "";
   for (row of splinters) {
     var value = row.buyvalue;
-    if(str == "sell") value = row.sellvalue;
+    if(str.toUpperCase() == "SELL") value = row.sellvalue;
     var name = row.name;
     if (currDict[name] != undefined) {
       var paddedline =
@@ -358,7 +358,7 @@ function getSplinters(str){
         + padString(value)
         + "× <:chaos:562076109865484289>\u2001→\u20011.0\u2001× "
         + currDict[name] + "\n";
-      if(str == "sell"){
+      if(str.toUpperCase() == "SELL"){
           paddedline =
           "1.0\u2001"
           + "×  " + currDict[name] + " \u2001→ " + padString(value) +
