@@ -32,10 +32,9 @@ let currencyData = [];
 let sextants = [];
 let splinters = [];
 let dataReady = false;
-
-
-
 var minTimer = 1000 * 60 * 30; //15 min
+
+
 // Dictionary with currency name to custom emoji id. CurrencyName:Emoji
 var currDict = {
   "Mirror of Kalandra": "<:mirror:562221382394445845>",
@@ -66,11 +65,14 @@ var currDict = {
 client.on('ready', () => {
     console.log("Connected as " + client.user.tag)
     var kaitosWorld = client.channels.get("568269774728069140");
+    kaitosWorld.fetchMessage("577804534298968064")
+    .then(message => message.clearReactions());
     ninjaAPI.update()
       .then((result) => {
-        updateTable("",result,"BUY");
+        updateTable(result,"BUY");
         return ninjaAPI.save();
       })
+
 
 })
 
@@ -109,71 +111,41 @@ client.on('guildMemberAdd', member => {
     else if (message.content.trim() == "!poggairs") {
       message.channel.send("***Poggairs sucks. ZeProtoge sucks.***");
     }
-
-    else if (message.content.trim() == "!tinny") {
-      message.channel.send("***Tinny sucks ass***");
-    }
     else if (message.content.trim() == "!streamers") {
       message.channel.send("_ _ \n**TinnyJu**: *<https://www.twitch.tv/tinnyju>*\n",{files: ["https://i.imgur.com/T7sMSLM.png"]}).then(
-        message.channel.send("_ _ \n**Tenkiei**: *<https://www.twitch.tv/tenkiei>*\n",{files: ["https://i.imgur.com/vXtDNyE.png"]})
-      )
-      ;
+      message.channel.send("_ _ \n**Tenkiei**: *<https://www.twitch.tv/tenkiei>*\n",{files: ["https://i.imgur.com/vXtDNyE.png"]}));
     }
     else if (message.content.trim() == "!commands" || message.content.trim() == "!help") {
       message.channel.send(commandEmbed());
     }
-//    else if (message.content.trim() == "!buy") {
-//      ninjaAPI.update()
-//        .then((result) => {
-//          updateTable(message,result,"BUY");
-//          return ninjaAPI.save();
-//        })
-//      }
 
-    // else if (message.content.trim() == "!sell") {
-    //   ninjaAPI.update()
-    //     .then((result) => {
-    //       updateTable(message,result,"SELL");
-    //       return ninjaAPI.save();
-    //     })
-    // }
-       });
-
-
- client.on('messageReactionAdd', (reaction, user) => {
-     if(reaction.emoji.name === "👎") {
-         //console.log(reaction.users);
-     }
  });
 
-function updateTable(m,result,col){
+function updateTable(result,col){
       populateCurrency(result);
       var kaitosWorld = client.channels.get("568269774728069140");
       kaitosWorld.fetchMessage("577804534298968064")
       .then(message =>
         message.edit(updateEmbed(col)).then((msg)=>{
-        message.react('👍').then(() => message.react('👎'));
+        message.react('🇧').then(() => message.react('🇸')).then(() => message.react('🔄'));
         const filter = (reaction, user) => {
-          return ['👍', '👎'].includes(reaction.emoji.name) && user.id != message.author.id;
+          return ['🇧', '🇸','🔄'].includes(reaction.emoji.name) && user.id != message.author.id;
         };
         message.awaitReactions(filter, { max: 1})
           .then(collected => {
             const reaction = collected.first();
-
             var u = reaction.users.find(element => element.bot == false);
-            //console.log(u);
-            if (reaction.emoji.name === '👍') {
-                msg.reactions.first().remove(u);
-
-                updateTable(message,result,"BUY");
+            if (reaction.emoji.name === '🇧') {
+                msg.reactions.find(element => element._emoji.name === '🇧').remove(u);
+                updateTable(result,"BUY");
             }
-            if (reaction.emoji.name === '👎') {
-              //console.log(msg.reactions.find(element => element._emoji.name === '👎'));
-
-              msg.reactions.find(element => element._emoji.name === '👎').remove(u);
-
-                //msg.reactions.first().remove(u);
-                updateTable(message,result,"SELL");
+            else if (reaction.emoji.name === '🇸') {
+                msg.reactions.find(element => element._emoji.name === '🇸').remove(u);
+                updateTable(result,"SELL");
+            }
+            else if (reaction.emoji.name === '🔄'){
+                msg.reactions.find(element => element._emoji.name === '🔄').remove(u);
+                updateTable(result,col);
             }
           })
           .catch(collected => {
@@ -182,7 +154,6 @@ function updateTable(m,result,col){
       })
       )
 }
-
 
 function commandEmbed(){
   embed = new Discord.RichEmbed()
