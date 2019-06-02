@@ -96,6 +96,8 @@ client.on('guildMemberAdd', member => {
 
 
   client.on("message", message => {
+    var command = message.content.split(" ");
+
     if (message.content.trim() == ("!hideouts")){
         message.channel.send("```css\n" + "Celestial Hideout : The Shaper's Realm [T17] \n" +
         "Alpline Hideout : Summit Map [T13] : Very Rare \n" +
@@ -113,13 +115,23 @@ client.on('guildMemberAdd', member => {
     }
     else if (message.content.trim() == "!streamers") {
       message.channel.send("_ _ \n**TinnyJu**: *<https://www.twitch.tv/tinnyju>*\n",{files: ["https://i.imgur.com/T7sMSLM.png"]}).then(
-      message.channel.send("_ _ \n**Tenkiei**: *<https://www.twitch.tv/tenkiei>*\n",{files: ["https://i.imgur.com/vXtDNyE.png"]}));
+      message.channel.send("_ _ \n**Tenkiei**: *<https://www.twitch.tv/tenkiei>*\n",{files: ["https://i.imgur.com/vXtDNyE.png"]}).then(
+      message.channel.send("_ _ \n**AllThingsKai**: *<https://www.twitch.tv/AllThingsKai>*\n",{files: ["https://imgur.com/a/ZM0ydHi"]})));
     }
     else if (message.content.trim() == "!commands" || message.content.trim() == "!help") {
       message.channel.send(commandEmbed());
     }
+    //else if (message.content.split() == ("!prune " +)
+    else if (command[0] == "!prune" && (typeof command[1] === 'string') && !isNaN(command[2])){
+      console.log(message.author.id + " " + message.author.username);
+      message.channel.fetchMessages().then(messages => {
+      const userMessages = messages.filter(msg => msg.author.username == command[1]);
+      //message.channel.bulkDelete(userMessages);
+      console.log(userMessages[1]);
 
- });
+
+    })
+ }});
 
 function updateTable(result,col){
       populateCurrency(result);
