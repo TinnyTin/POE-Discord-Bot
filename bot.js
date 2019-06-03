@@ -125,13 +125,30 @@ client.on('guildMemberAdd', member => {
     else if (command[0] == "!prune" && (typeof command[1] === 'string') && !isNaN(command[2])){
       console.log(message.author.id + " " + message.author.username);
       message.channel.fetchMessages().then(messages => {
-      const userMessages = messages.filter(msg => msg.author.username == command[1]);
-      //message.channel.bulkDelete(userMessages);
-      console.log(userMessages[1]);
+        const userMessages = messages.filter(msg => msg.author.username == command[1]);
+        //message.channel.bulkDelete(userMessages);
+        var count = command[2];
+        userMessages.forEach( function (value, key, map) {
+            if (count > 0) {
+             message.channel.fetchMessage(key).then( m => m.delete());
+             count--;
+           }
+         });
+     });
+  }
+});
 
 
-    })
- }});
+      //console.log(userMessages);
+      //console.log(userMessages.get(key));
+
+
+
+  //helper to get key-value pairs
+ function logMapElements(value, key, map) {
+
+     console.log(`map.get('${key}') = ${value}`);
+}
 
 function updateTable(result,col){
       populateCurrency(result);
