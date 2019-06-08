@@ -4,7 +4,7 @@ var NinjaAPI = require("poe-ninja-api-manager");
 
 
 var ninjaAPI = new NinjaAPI({
-  league: "Synthesis"
+  league: "Legion"
 });
 
 class CurrencyRow {
