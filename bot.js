@@ -32,6 +32,7 @@ let currencyData = [];
 let sextants = [];
 let splinters = [];
 let dataReady = false;
+let toDelete = [];
 var minTimer = 1000 * 60 * 30; //15 min
 
 
@@ -123,32 +124,16 @@ client.on('guildMemberAdd', member => {
     }
     //else if (message.content.split() == ("!prune " +)
     else if (command[0] == "!prune" && (typeof command[1] === 'string') && !isNaN(command[2])){
-      console.log(message.author.id + " " + message.author.username);
-      message.channel.fetchMessages().then(messages => {
-        const userMessages = messages.filter(msg => msg.author.username == command[1]);
-        //message.channel.bulkDelete(userMessages);
-        var count = command[2];
-        userMessages.forEach( function (value, key, map) {
-            if (count > 0) {
-             message.channel.fetchMessage(key).then( m => m.delete());
-             count--;
-           }
-         });
+      //if variable 2 is an int, general channel purge. else, purge based on user
+      const amount = !!parseInt(message.content.split(' ')[1]) ? parseInt(message.content.split(' ')[1]) : parseInt(message.content.split(' ')[2]);
+      message.channel.fetchMessages({limit:100}).then(messages => {
+            const user = message.mentions.users.first(); //first user mentioned (@) in the message
+            const filterBy = user ? user.id : client.user.id;
+             messages = messages.filter(m => m.author.id === filterBy).array().slice(0, amount).reverse();
+             message.channel.bulkDelete(messages).catch(error => console.log(error.stack));
      });
   }
 });
-
-
-      //console.log(userMessages);
-      //console.log(userMessages.get(key));
-
-
-
-  //helper to get key-value pairs
- function logMapElements(value, key, map) {
-
-     console.log(`map.get('${key}') = ${value}`);
-}
 
 function updateTable(result,col){
       populateCurrency(result);
